@@ -1,0 +1,67 @@
+import javax.swing.table.AbstractTableModel;
+import java.util.ArrayList;
+import java.util.List;
+
+public class DoctorTableModel extends AbstractTableModel {
+    private final List<Doctor> doctors;
+    private final List<Doctor> filteredDoctors;
+    private final String[] columnNames = {"Name", "Contact", "Age", "Specialization", "Start Time", "End Time"};
+
+    public DoctorTableModel() {
+        this.doctors = new ArrayList<>();
+        this.filteredDoctors = new ArrayList<>();
+    }
+
+    public void addDoctor(Doctor doctor) {
+        doctors.add(doctor);
+        filteredDoctors.add(doctor);
+        fireTableDataChanged();
+    }
+
+    public void filter(String query) {
+        filteredDoctors.clear();
+        for (Doctor doctor : doctors) {
+            if (doctor.getName().toLowerCase().contains(query)
+                    || doctor.getContact().toLowerCase().contains(query)
+                    || doctor.getSpecialization().toLowerCase().contains(query)) {
+                filteredDoctors.add(doctor);
+            }
+        }
+        fireTableDataChanged();
+    }
+
+    public void resetFilter() {
+        filteredDoctors.clear();
+        filteredDoctors.addAll(doctors);
+        fireTableDataChanged();
+    }
+
+    @Override
+    public int getRowCount() {
+        return filteredDoctors.size();
+    }
+
+    @Override
+    public int getColumnCount() {
+        return columnNames.length;
+    }
+
+    @Override
+    public Object getValueAt(int row, int column) {
+        Doctor doctor = filteredDoctors.get(row);
+        switch (column) {
+            case 0: return doctor.getName();
+            case 1: return doctor.getContact();
+            case 2: return doctor.getAge();
+            case 3: return doctor.getSpecialization();
+            case 4: return doctor.getStartTime();
+            case 5: return doctor.getEndTime();
+            default: return null;
+        }
+    }
+
+    @Override
+    public String getColumnName(int column) {
+        return columnNames[column];
+    }
+}
