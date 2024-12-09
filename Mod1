@@ -1,0 +1,104 @@
+import javax.swing.*;
+import java.awt.*;
+
+public class DoctorProfilePanel extends JPanel {
+    private JTextField nameField, contactField, ageField;
+    private JComboBox<String> specializationDropdown;
+    private JSpinner startTimeSpinner, endTimeSpinner;
+
+    public DoctorProfilePanel(CardLayout cardLayout, JPanel container, DoctorTableModel tableModel) {
+        setLayout(new BorderLayout(10, 10));
+        setBorder(BorderFactory.createTitledBorder("Doctor Profile"));
+
+        JPanel formPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 5, 5, 5); // Reduced gap
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+
+        // Input fields
+        nameField = new JTextField(20);
+        contactField = new JTextField(20);
+        ageField = new JTextField(20);
+        specializationDropdown = new JComboBox<>(new String[]{"Cardiologist", "Dermatologist", "Neurologist", "Pediatrician"});
+        startTimeSpinner = new JSpinner(new SpinnerDateModel());
+        endTimeSpinner = new JSpinner(new SpinnerDateModel());
+
+        // Format spinners
+        startTimeSpinner.setEditor(new JSpinner.DateEditor(startTimeSpinner, "HH:mm"));
+        endTimeSpinner.setEditor(new JSpinner.DateEditor(endTimeSpinner, "HH:mm"));
+
+        // Add components to the form panel
+        addField(formPanel, gbc, "Doctor Name:", nameField, 0);
+        addField(formPanel, gbc, "Contact:", contactField, 1);
+        addField(formPanel, gbc, "Age:", ageField, 2);
+        addField(formPanel, gbc, "Specialization:", specializationDropdown, 3);
+        addField(formPanel, gbc, "Start Time:", startTimeSpinner, 4);
+        addField(formPanel, gbc, "End Time:", endTimeSpinner, 5);
+
+        // Add buttons
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
+        JButton saveButton = new JButton("Save");
+        saveButton.addActionListener(e -> saveDoctorProfile(tableModel));
+        JButton clearButton = new JButton("Clear");
+        clearButton.addActionListener(e -> clearFields());
+        buttonPanel.add(saveButton);
+        buttonPanel.add(clearButton);
+
+        // Add go to browser button at the bottom
+        JButton goToBrowserButton = new JButton("Go to Browser Page");
+        goToBrowserButton.addActionListener(e -> cardLayout.show(container, "Browser"));
+
+        // Add panels to the main layout
+        add(formPanel, BorderLayout.CENTER);
+        add(buttonPanel, BorderLayout.NORTH);
+        add(goToBrowserButton, BorderLayout.SOUTH);
+    }
+
+    private void addField(JPanel panel, GridBagConstraints gbc, String label, JComponent field, int row) {
+        gbc.gridx = 0;
+        gbc.gridy = row;
+        gbc.weightx = 0.2;
+        panel.add(new JLabel(label), gbc);
+
+        gbc.gridx = 1;
+        gbc.weightx = 0.8;
+        panel.add(field, gbc);
+    }
+
+    private void saveDoctorProfile(DoctorTableModel tableModel) {
+        String name = nameField.getText().trim();
+        String contact = contactField.getText().trim();
+        String ageText = ageField.getText().trim();
+        String specialization = (String) specializationDropdown.getSelectedItem();
+        String startTime = startTimeSpinner.getValue().toString();
+        String endTime = endTimeSpinner.getValue().toString();
+
+        if (name.isEmpty() || contact.isEmpty() || ageText.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please fill all fields!", "Validation Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        try {
+            int age = Integer.parseInt(ageText);
+            if (age <= 0) {
+                JOptionPane.showMessageDialog(this, "Age must be a positive number!", "Validation Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            Doctor doctor = new Doctor(name, contact, age, specialization, startTime, endTime);
+            tableModel.addDoctor(doctor);
+            JOptionPane.showMessageDialog(this, "Doctor Profile Saved Successfully!");
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Age must be a valid number!", "Validation Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void clearFields() {
+        nameField.setText("");
+        contactField.setText("");
+        ageField.setText("");
+        specializationDropdown.setSelectedIndex(0);
+        startTimeSpinner.setValue(new SpinnerDateModel().getDate());
+        endTimeSpinner.setValue(new SpinnerDateModel().getDate());
+    }
+}
