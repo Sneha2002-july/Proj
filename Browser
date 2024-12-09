@@ -1,0 +1,38 @@
+import javax.swing.*;
+import java.awt.*;
+
+public class BrowserPanel extends JPanel {
+    private JTextField searchField;
+    private JTable table;
+
+    public BrowserPanel(CardLayout cardLayout, JPanel container, DoctorTableModel tableModel) {
+        setLayout(new BorderLayout());
+        setBorder(BorderFactory.createTitledBorder("Doctor List"));
+
+        JPanel searchPanel = new JPanel(new BorderLayout());
+        searchField = new JTextField();
+        JButton searchButton = new JButton("Search");
+        searchButton.addActionListener(e -> searchDoctor(tableModel));
+
+        searchPanel.add(new JLabel("Search:"), BorderLayout.WEST);
+        searchPanel.add(searchField, BorderLayout.CENTER);
+        searchPanel.add(searchButton, BorderLayout.EAST);
+        add(searchPanel, BorderLayout.NORTH);
+
+        table = new JTable(tableModel);
+        add(new JScrollPane(table), BorderLayout.CENTER);
+
+        JButton backButton = new JButton("Back to Profile Page");
+        backButton.addActionListener(e -> cardLayout.show(container, "Profile"));
+        add(backButton, BorderLayout.SOUTH);
+    }
+
+    private void searchDoctor(DoctorTableModel tableModel) {
+        String query = searchField.getText().trim().toLowerCase();
+        if (!query.isEmpty()) {
+            tableModel.filter(query);
+        } else {
+            tableModel.resetFilter();
+        }
+    }
+}
