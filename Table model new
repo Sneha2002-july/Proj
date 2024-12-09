@@ -1,0 +1,25 @@
+import java.util.ArrayList;
+import java.util.List;
+
+public class DoctorTableModel {
+    private List<Doctor> doctorList;
+    private int nextDoctorId; // To keep track of the next available Doctor ID
+
+    public DoctorTableModel() {
+        doctorList = new ArrayList<>();
+        nextDoctorId = 1; // Start ID from 1
+    }
+
+    public void addDoctor(Doctor doctor) {
+        doctor.setDoctorId(nextDoctorId++);
+        doctorList.add(doctor);
+    }
+
+    public List<Doctor> getDoctorList() {
+        return doctorList;
+    }
+
+    public int getNextDoctorId() {
+        return nextDoctorId;
+    }
+}
